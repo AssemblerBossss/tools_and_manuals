@@ -1,0 +1,21 @@
+Самостоятельная работа
+
+1. Запустите в кластере pod из образа busybox:latest c командой sh -c 'while true; do echo New random number is $(( ( RANDOM % 100 )  + 1 )); sleep 2; done'  и именем hello
+
+    Для указания команды в pod'е используется поле command. Оно очень похоже на аналогичное в docker-compose.
+
+    command указывается внутри описания контейнера. На одном уровне с image и name.
+
+    Пример:
+
+    command: ['bash', '-c', 'echo $HOSTNAME']
+
+2. Посмотрите логи pod'а командой:
+
+kubectl logs hello
+
+3. Отправьте одну строчку лога в качестве ответа на этот шаг.
+
+4. После выполнения задания удалите pod:
+
+kubectl delete pod hello
