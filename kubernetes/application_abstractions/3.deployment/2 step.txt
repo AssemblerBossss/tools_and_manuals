@@ -1,0 +1,19 @@
+Запускаем Deployment
+
+1. Перейдите в директорию:3.deployment
+
+cd ~/slurm/practice/2.application-abstractions/3.deployment/
+
+2. Создайте deployment из файла deployment.yaml
+
+3. Проверьте что появились два запущенных pod'а и один replicaset.
+
+4. С помощью команды kubectl set image deployment my-deployment nginx=nginx:1.21 обновляем версию image для container в deployment my-deployment
+
+5. Проверьте, что все pod'ы deployment'а заново создались и версия образа в них теперь nginx:1.21
+
+6. Скопируйте и отправьте в качестве ответа на данном шаге результат выполнения команды:
+
+kubectl get deployment my-deployment -o=jsonpath='{.status.conditions[1].message}{"\n"}'
+
+7. После выполнения задания удалите deployment.
