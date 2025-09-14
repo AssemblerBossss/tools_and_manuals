@@ -42,3 +42,16 @@ curl 127.0.0.1:8080
 ```
 
 Вывод не изменился
+
+
+## 5. Проверим конфигмап в поде
+
+Если изменения все еще нет, то может быть нужно подождать до двух минут
+```bash
+kubectl exec -it my-deployment-<TAB> -- bash
+
+cat /etc/nginx/conf.d/default.conf
+......
+            return 200 '$hostname\nOK\n';
+......
+```
