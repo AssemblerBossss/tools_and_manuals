@@ -198,3 +198,62 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 sudo kubeadm join 10.0.2.101:6443 --token <TOKEN> --discovery-token-ca-cert-hash sha256:<HASH>
 
 ```
+
+## Скрипт `reset.sh`
+```bash
+#!/bin/bash
+set -euo pipefail
+
+echo "[INFO] Starting Kubernetes node cleanup on $(hostname)..."
+
+# 1. Сброс конфигурации кластера
+echo "[INFO] Running kubeadm reset..."
+sudo kubeadm reset -f || true
+
+# 2. Остановка служб
+echo "[INFO] Stopping kubelet and container runtime..."
+sudo systemctl stop kubelet 2>/dev/null || true
+sudo systemctl stop containerd 2>/dev/null || true
+sudo systemctl stop docker 2>/dev/null || true
+
+# 3. Размонтирование всех kubelet-томов
+echo "[INFO] Unmounting leftover kubelet mounts..."
+sudo umount $(mount | grep '/var/lib/kubelet' | awk '{print $3}') 2>/dev/null || true
+
+# 4. Очистка каталогов Kubernetes и CNI
+echo "[INFO] Removing Kubernetes and CNI directories..."
+sudo rm -rf /etc/kubernetes \
+             /var/lib/etcd \
+             /var/lib/kubelet/* \
+             /var/lib/kube-proxy \
+             /etc/cni/net.d \
+             /var/lib/cni \
+             /opt/cni \
+             /var/run/kubernetes \
+             /var/lib/dockershim 2>/dev/null || true
+
+# 5. Очистка сетевых интерфейсов CNI
+echo "[INFO] Cleaning up network interfaces..."
+for iface in cni0 flannel.1 weave br0 docker0; do
+    sudo ip link delete $iface 2>/dev/null || true
+done
+
+# 6. Очистка iptables
+echo "[INFO] Flushing iptables rules..."
+sudo iptables -F || true
+sudo iptables -t nat -F || true
+sudo iptables -t mangle -F || true
+sudo iptables -X || true
+
+# 7. Удаление kubeconfig пользователя
+echo "[INFO] Removing kubeconfig for current user..."
+rm -rf $HOME/.kube 2>/dev/null || true
+
+# 8. Перезапуск системных демонов
+echo "[INFO] Reloading systemd..."
+sudo systemctl daemon-reload
+sudo systemctl restart containerd 2>/dev/null || true
+sudo systemctl restart docker 2>/dev/null || true
+
+echo "[OK] Cleanup completed on $(hostname)"
+```
