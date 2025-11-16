@@ -51,7 +51,9 @@ qm start 903
 ```bash
 echo "network: {config: disabled}" | sudo tee /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg
 ```
-2. Создать свой netplan-файл `/etc/netplan/01-netcfg.yaml`
+2. Добавить сетевой интерфейс ens19 vmbr1
+ 
+3. Создать свой netplan-файл `/etc/netplan/01-netcfg.yaml`
 
 ```yaml        
 network:
@@ -61,43 +63,46 @@ network:
     ens18:
       dhcp4: false
       addresses:
-      # 101-master, 102-worker-1, 103-worker-2
-        - 10.0.2.101/24 
+        - 10.0.2.101/24
       gateway4: 10.0.2.2
       nameservers:
         addresses: [8.8.8.8, 1.1.1.1]
+    ens19:
+      addresses:
+        - 192.168.56.201/24 # 20X - master, 111+ - worker 
+      dhcp4: false
 ```
 
-3. Применить (статические IP-адреса сохранятся даже после перезагрузки)
+4. Применить (статические IP-адреса сохранятся даже после перезагрузки)
 ```bash
 sudo netplan apply
 ```
-4. По базе
+5. По базе
 
 ```bash
 sudo apt update && sudo apt upgrade -y
 ```
 
-5. Устанавливаем нужные пакеты
+6. Устанавливаем нужные пакеты
 ```bash   
 sudo apt install -y apt-transport-https ca-certificates curl
 ```
 
-6. Отключаем swap (Kubernetes требует)
+7. Отключаем swap (Kubernetes требует)
    
 ```bash
 sudo swapoff -a
 sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
 ```
 
-7. Включаем необходимые модули ядра
+8. Включаем необходимые модули ядра
    
 ```bash
 sudo modprobe overlay
 sudo modprobe br_netfilter
 ```        
 
-8. Настройка sysctl для Kubernetes
+9. Настройка sysctl для Kubernetes
 
 ```bash
 cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
@@ -257,3 +262,15 @@ sudo systemctl restart docker 2>/dev/null || true
 
 echo "[OK] Cleanup completed on $(hostname)"
 ```
+
+
+## Настройка PROXMOX для общей сети
+```bash
+vboxmanage modifyvm "Proxmox-VE" --nic2 hostonly --hostonlyadapter2 vboxnet0 --nicpromisc2 allow-all --cableconnected2 on
+```
+Эта команда настраивает виртуальную машину “Proxmox-VE” в VirtualBox, изменяя параметры её второго сетевого адаптера (NIC2). Вкратце она делает следующее:
+
+- Устанавливает тип сети NIC2 как Host-Only — VM получает сетевое соединение только с хостом и другими VM в этой сети.
+- Назначает адаптеру Host-Only сеть vboxnet0.
+- Включает режим promisc (allow-all) — адаптер сможет принимать весь сетевой трафик в сети, что полезно для бриджинга или мониторинга.
+- Включает "подключён кабель" — адаптер считается активным
