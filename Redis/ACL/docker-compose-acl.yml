@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+    # Use custom config file with ACL
+    command: redis-server /usr/local/etc/redis/redis.conf
+    ports:
+      - "6379:6379"
+    volumes:
+      # Config files
+      - ./redis-with-acl.conf:/usr/local/etc/redis/redis.conf:ro
+      - ./users.acl:/usr/local/etc/redis/users.acl:ro
+      # Data persistence
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      # Healthcheck с admin пользователем
+      test: ["CMD", "redis-cli", "-a", "AdminStrongPass123!", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    environment:
+      # Optional: для логирования
+      - REDIS_LOG_LEVEL=notice
+
+volumes:
+  redis-data:
+    driver: local
