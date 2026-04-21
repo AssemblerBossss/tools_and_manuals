@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber-v2
+  labels:
+    app: kuber-v2
+spec:
+  replicas: 2
+  minReadySeconds: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: http-server-v2
+  template:
+    metadata:
+      labels:
+        app: http-server-v2
+    spec:
+      containers:
+      - name: kuber-app
+        image: bokovets/kuber:v2.0
+        ports:
+        - containerPort: 8000
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name:  kuber-service-v2
+spec:
+  selector:
+    app:  http-server-v2
+  ports:
+  - protocol: TCP
+    port:  80
+    targetPort:  8000
+  type: ClusterIP
+
+  

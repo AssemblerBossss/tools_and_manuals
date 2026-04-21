@@ -1,4 +1,4 @@
-# Proxmox
+jammy-server-cloudimg-amd64.img.2# Proxmox
 
 Команды ниже выполняются на хосте proxmox
 

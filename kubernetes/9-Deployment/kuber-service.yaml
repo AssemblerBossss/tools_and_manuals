@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  kuber-service
+spec:
+  selector:
+    app:  http-server
+  ports:
+  - protocol: TCP
+    port:  80
+    targetPort:  8000
+  type: ClusterIP

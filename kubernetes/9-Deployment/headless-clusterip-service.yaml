@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name:  kuber-headless-service
+spec:
+  clusterIP: None
+  selector:
+    app:  http-server
+  ports:
+  - protocol: TCP
+    port:  80
+    targetPort:  8000
+  type: ClusterIP
