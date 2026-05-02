@@ -1,0 +1,35 @@
+version: "2"
+services:
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      FAIL: "false"
+      SLEEP: "0"
+      FROM_USERNAME: "rmuser"
+      FROM_PASSWORD: "rmpassword"
+      FROM_HOSTNAME: "rabbitmq"
+      FROM_PORT: "5672"
+      FROM_QUEUE: "inbox"
+      FROM_EXCHANGE: "in"
+      FROM_ROUTINGKEY: "gen"
+      FROM_PASSIVE: "false"
+      RETRY_QUEUE: "false"
+      RETRY_QUEUE_TTL: "15000"
+      PREFETCH: "2"
+
+
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports: ["15672:15672"]
