@@ -27,10 +27,3 @@ docker run --rm -p9999:80 registry.gitlab.com/kilexst/rabbitmq-docs:main
 
 # Распространение
 Конспекты подготовлены как дополнительные методические материалы к моему курсу [«RabbitMQ для админов и разработчиков»](https://slurm.io/rabbitmq-course) и распространяются с разрешения Слёрм. Тем, кто захочет ещё глубже погрузиться в нюансы работы с RabbitMQ, промокод на скидку 10% при оплате курса:
-> RMQS10?
-
-
-# Контакты
-Barabanov Aleksey  
-telegram [@KiLEXst](https://t.me/KiLEXst)  
-[Чат RabbitMQ](https://t.me/rabbitmq_ru)
