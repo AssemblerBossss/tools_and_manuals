@@ -8,7 +8,7 @@ RUN file-rename "s/README.MD/index.md/" *
 RUN file-rename "s/README.MD/index.md/" */*
 RUN find . -name README.MD 
 ENV WORKSPACE=/home
-ENV TITLE="RabbitMQ курс"
+ENV TITLE="tools-and-manuals"
 ENV LANGUAGE=ru
 ENV ICON=rabbit-variant-outline
 RUN makedocs ./src ./dst

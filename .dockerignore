@@ -1,3 +1,6 @@
 rabbitmq/consumer
 rabbitmq/generator
 rabbitmq/erlang-c
+.git/
+*.go
+*.yaml

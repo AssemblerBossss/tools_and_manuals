@@ -258,11 +258,11 @@ rabbitmqadmin help subcommands
 Примеры команд:
 
 ```bash
-rabbitmqadmin -urmuser -prmpassword declare queue name=console_queue
-rabbitmqadmin -urmuser -prmpassword declare exchange name=console_exchange type=direct
-rabbitmqadmin -urmuser -prmpassword declare binding source=console_exchange destination=console_queue routing_key=test
-rabbitmqadmin -urmuser -prmpassword publish routing_key=console_queue payload="test message from rabbitmqadmin"
-rabbitmqadmin -urmuser -prmpassword publish exchange=console_exchange routing_key=test payload="test message from rabbitmqadmin"
+rabbitmqadmin -urmuser -prmpassword declare queue --name=console_queue
+rabbitmqadmin -urmuser -prmpassword declare exchange --name=console_exchange --type=direct
+rabbitmqadmin -urmuser -prmpassword declare binding --source=console_exchange --destination=console_queue --routing_key=test
+rabbitmqadmin -urmuser -prmpassword publish message --routing_key=console_queue --payload="test message from rabbitmqadmin"
+rabbitmqadmin -urmuser -prmpassword publish message --exchange=console_exchange --routing-key=console --payload="test message from rabbitmqadmin"
 rabbitmqadmin -urmuser -prmpassword get queue=console_queue count=10
 rabbitmqadmin -urmuser -prmpassword list queues
 rabbitmqadmin -urmuser -prmpassword list exchanges
