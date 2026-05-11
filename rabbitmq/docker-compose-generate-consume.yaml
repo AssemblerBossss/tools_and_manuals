@@ -1,0 +1,71 @@
+services:
+
+  consumer:
+    build:
+      context: ./consumer
+      dockerfile: Dockerfile
+    environment:
+      FAIL: "true"
+      SLEEP: "150"
+      FROM_USERNAME: "rmuser"
+      FROM_PASSWORD: "rmpassword"
+      FROM_HOSTNAME: "rabbitmq"
+      FROM_PORT: "5672"
+      FROM_QUEUE: "inbox"
+      FROM_EXCHANGE: "in"
+      FROM_ROUTINGKEY: "gen"
+      FROM_PASSIVE: "false"
+      RETRY_QUEUE: "false"
+      RETRY_QUEUE_TTL: "15000"
+      PREFETCH: "2"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - rabbitmq-net
+
+  gen:
+    build:
+      context: ./generator
+      dockerfile: Dockerfile
+    environment:
+      APP_DEBUG: "false"
+      TO_USERNAME: "rmuser"
+      TO_PASSWORD: "rmpassword"
+      TO_HOSTNAME: "rabbitmq"
+      TO_PORT: "5672"
+      TO_QUEUE: "inbox"
+      TO_EXCHANGE: "in"
+      TO_ROUTINGKEY: "gen"
+      TO_PASSIVE: "false"
+      MCH_MODE: "false"
+      JOB_MODE: "false"
+      COUNT: "1000000"
+      SLEEP: "100"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - rabbitmq-net
+
+  rabbitmq:
+    image: rabbitmq:4.3.0-management-alpine
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: rmuser
+      RABBITMQ_DEFAULT_PASS: rmpassword
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit disk_free_limit 2147483648
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports: ["15672:15672"]
+    networks:
+      - rabbitmq-net
+
+networks:
+  rabbitmq-net:
+    driver: bridge
