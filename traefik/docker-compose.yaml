@@ -1,0 +1,29 @@
+services:
+  reverse-proxy:
+    image: traefik:v3.7
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web_secure.address=:443"
+      - "--providers.docker.network=proxynet"
+      - "--log.level=DEBUG"
+      #SSL Let'sEncrypt:
+      - "--entrypoints.web_secure.http.tls.certResolver=le"
+      - "--certificatesresolvers.le.acme.tlschallenge=true"
+      - "--certificatesresolvers.le.acme.email=tester@romnero.de"
+      - "--certificatesresolvers.le.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8081:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+#      - ./traefik.yaml:/traefik.yaml:ro
+      - ./letsencrypt:/letsencrypt
+
+networks:
+  default:
+    name: proxynet
+    external: true

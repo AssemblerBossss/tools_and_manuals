@@ -1,0 +1,14 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nginx.rule=Host(`nginx.localhost`)"
+      - "traefik.http.routers.nginx.entrypoints=web"
+      - "traefik.http.services.nginx.loadbalancer.server.port=80"
+
+networks:
+  default:
+    name: proxynet
+    external: true

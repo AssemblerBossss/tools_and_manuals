@@ -1,0 +1,13 @@
+api:
+  insecure: true
+log:
+  level: DEBUG
+
+providers:
+  docker:
+    exposedByDefault: false
+    network: proxynet
+
+entryPoints:
+  web:
+    address: ":80"
